@@ -1,6 +1,6 @@
 # shorturl-backend
 
-Backend Service For Short URL(A URL Shortening Service).
+Backend Service For Short URL (A URL Shortening Service). Here is the [React](https://github.com/amit-barman/shorturl-frontend) based Frontend for this project.
 
 ## Screenshots
 
