@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using shorturl.Model;
 using shorturl.Utils;
 using System.Linq;
+using shorturl.Authentication;
 
 namespace shorturl.Controllers;
 
@@ -12,6 +13,7 @@ public class ShortUrlController : ControllerBase
     private static readonly int _shortUrlLen = 6;
 
     [HttpPost("short")]
+    [ServiceFilter(typeof(AuthFilter))]
     public async Task<ActionResult> shortURL( UserInput longurl ){
 
         try {
