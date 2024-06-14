@@ -1,7 +1,15 @@
 using shorturl.Authentication;
+using Microsoft.EntityFrameworkCore;
+using shorturl.Data;
+using shorturl.Repository;
+using shorturl.Dto;
 
 var builder = WebApplication.CreateBuilder(args);
 var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -17,6 +25,10 @@ builder.Services.AddCors(options =>
                       });
 });
 // Add services to the container.
+
+builder.Services.AddDbContext<ShortUrlDBContext>(
+    options => options.UseSqlite("name=ConnectionStrings:DefaultConnection")
+);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

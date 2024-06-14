@@ -1,4 +1,4 @@
-namespace shorturl.Model;
+namespace shorturl.Dto;
 
 public class UserInput
 {

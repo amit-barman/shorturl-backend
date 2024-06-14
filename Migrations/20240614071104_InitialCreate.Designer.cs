@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using shorturl.Model;
+using shorturl.Data;
 
 #nullable disable
 
 namespace shorturl.Migrations
 {
     [DbContext(typeof(ShortUrlDBContext))]
-    [Migration("20240406064933_InitialCreate")]
+    [Migration("20240614071104_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using shorturl.Repository;
+using shorturl.Dto;
 using shorturl.Model;
 using shorturl.Utils;
 using System.Linq;
@@ -10,52 +12,35 @@ namespace shorturl.Controllers;
 [Route("/")]
 public class ShortUrlController : ControllerBase
 {
-    private static readonly int _shortUrlLen = 6;
+    private readonly IShortUrlRepository _shorturlrepository;
+
+    public ShortUrlController( IShortUrlRepository shorturlrepository )
+    {
+        _shorturlrepository = shorturlrepository;
+    }
 
     [HttpPost("short")]
     [ServiceFilter(typeof(AuthFilter))]
-    public async Task<ActionResult> shortURL( UserInput longurl ){
+    public async Task<ActionResult> shortURL( UserInput longUrl )
+    {
+        URL? shortURL = _shorturlrepository.createsShortURL(longUrl);
 
-        try {
-            using var db = new ShortUrlDBContext();
-        
-            if(!Uri.TryCreate(longurl.longUrl, UriKind.Absolute, out _))
-            {
-                return BadRequest("Invalid Url");
-            } else {
-                string shorturl = RandomUrl.getRandomURL(_shortUrlLen);
-
-                while(db.Urls.Any(x => x.shortUrl == shorturl)){
-                    shorturl = RandomUrl.getRandomURL(_shortUrlLen);
-                }
-
-                URL url = new URL
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    realUrl = longurl.longUrl,
-                    shortUrl = $"{Request.Scheme}://{Request.Host.Value}/{shorturl}",
-                    creationTime = DateTime.Now.ToString()
-                };
-                db.Add(url);
-                db.SaveChanges();
-
-                return Ok(url);
-            }
+        if( shortURL != null )
+        {
+            return Ok(shortURL);
         }
-        catch(Exception e){
-            return BadRequest("Something Went Wrong!");
-        }
+        return BadRequest("Unable To Create Short Url");
     }
 
     [HttpGet("/{shorturlEndpoint}")]
-    public async Task<ActionResult> retrieveRealUrl( string shorturlEndpoint ){
-        try {
-            using var db = new ShortUrlDBContext();
-            URL resp = db.Urls.Single(b => b.shortUrl.Contains(shorturlEndpoint));
-            return Redirect(resp.realUrl);
-        } catch(Exception e){
-            Console.WriteLine(e);
-            return BadRequest("Requested Endpoint Not Found!");
+    public async Task<ActionResult> retrieveRealUrl( string shorturlEndpoint )
+    {
+        string? longUrl = _shorturlrepository.extractShortURL(shorturlEndpoint);
+
+        if(longUrl != null) 
+        {
+            return Redirect(longUrl);
         }
+        return BadRequest("Invalid Url");
     }
 }
